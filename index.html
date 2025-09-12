@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #212529;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #343a40;
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scanner-container {
+            width: 100%;
+            max-width: 500px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        #reader {
+            width: 100%;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .result-container {
+            padding: 20px;
+            text-align: center;
+        }
+
+        #result {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            word-break: break-all;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #495057;
+            border: 1px solid #e9ecef;
+        }
+
+        .btn {
+            background-color: #ffffff;
+            color: #343a40;
+            border: 1px solid #dee2e6;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin: 5px;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: #f8f9fa;
+            border-color: #adb5bd;
+        }
+
+        .btn-primary {
+            background-color: #e9ecef;
+            color: #212529;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background-color: #dee2e6;
+        }
+
+        .upload-section {
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            background-color: #ffffff;
+            color: #343a40;
+            border: 1px solid #dee2e6;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .file-input-label:hover {
+            background-color: #f8f9fa;
+            border-color: #adb5bd;
+        }
+
+        footer {
+            background-color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .attribution {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #ffffff;
+            color: #495057;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            max-width: 80%;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-left: 4px solid #28a745;
+        }
+
+        .notification.error {
+            border-left: 4px solid #dc3545;
+        }
+
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            background-color: #f8f9fa;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background-color: #ffffff;
+            color: #343a40;
+            border-bottom: 3px solid #343a40;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .scanner-container {
+                border-radius: 0;
+            }
+            
+            main {
+                padding: 10px;
+            }
+            
+            .btn, .file-input-label {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>QR Code Scanner</h1>
+    </header>
+
+    <main>
+        <div class="scanner-container">
+            <div class="tab-container">
+                <div class="tab active" id="camera-tab">Camera</div>
+                <div class="tab" id="upload-tab">Upload</div>
+            </div>
+            
+            <div class="tab-content active" id="camera-content">
+                <div id="reader"></div>
+                <div class="result-container">
+                    <button id="startButton" class="btn btn-primary">Start Scanning</button>
+                    <button id="stopButton" class="btn">Stop Scanning</button>
+                    <div id="result">Scan a QR code to see the result</div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="upload-content">
+                <div class="upload-section">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="file-input" accept="image/*">
+                        <label for="file-input" class="file-input-label">Choose QR Code Image</label>
+                    </div>
+                    <div id="upload-result" style="margin-top: 15px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; min-height: 60px; display: flex; align-items: center; justify-content: center; color: #495057;">
+                        Upload a QR code image to scan
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="attribution">Made with ❤️ by Sauravhhh</div>
+    </footer>
+
+    <div id="notification" class="notification"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const html5QrCode = new Html5Qrcode("reader");
+            const resultElement = document.getElementById('result');
+            const uploadResultElement = document.getElementById('upload-result');
+            const startButton = document.getElementById('startButton');
+            const stopButton = document.getElementById('stopButton');
+            const fileInput = document.getElementById('file-input');
+            const notification = document.getElementById('notification');
+            const cameraTab = document.getElementById('camera-tab');
+            const uploadTab = document.getElementById('upload-tab');
+            const cameraContent = document.getElementById('camera-content');
+            const uploadContent = document.getElementById('upload-content');
+            
+            let isScanning = false;
+
+            // Tab switching
+            cameraTab.addEventListener('click', () => {
+                cameraTab.classList.add('active');
+                uploadTab.classList.remove('active');
+                cameraContent.classList.add('active');
+                uploadContent.classList.remove('active');
+            });
+
+            uploadTab.addEventListener('click', () => {
+                uploadTab.classList.add('active');
+                cameraTab.classList.remove('active');
+                uploadContent.classList.add('active');
+                cameraContent.classList.remove('active');
+                
+                // Stop camera scanning when switching to upload tab
+                if (isScanning) {
+                    stopScanning();
+                }
+            });
+
+            // Camera scanning
+            startButton.addEventListener('click', startScanning);
+            stopButton.addEventListener('click', stopScanning);
+
+            function startScanning() {
+                if (isScanning) return;
+                
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    {
+                        fps: 10,
+                        qrbox: { width: 250, height: 250 }
+                    },
+                    (decodedText, decodedResult) => {
+                        resultElement.textContent = decodedText;
+                        showNotification('QR Code scanned successfully!', 'success');
+                    },
+                    (errorMessage) => {
+                        // Handle scan error silently
+                    }
+                ).then(() => {
+                    isScanning = true;
+                    resultElement.textContent = "Scanning...";
+                    showNotification('Camera started. Point at a QR code to scan.', 'success');
+                }).catch(err => {
+                    resultElement.textContent = "Error starting camera: " + err;
+                    showNotification('Error accessing camera. Please check permissions.', 'error');
+                });
+            }
+
+            function stopScanning() {
+                if (!isScanning) return;
+                
+                html5QrCode.stop().then(() => {
+                    isScanning = false;
+                    resultElement.textContent = "Scan a QR code to see the result";
+                    showNotification('Camera stopped.', 'success');
+                }).catch(err => {
+                    showNotification('Error stopping camera: ' + err, 'error');
+                });
+            }
+
+            // File upload scanning
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files.length === 0) {
+                    return;
+                }
+                
+                const file = e.target.files[0];
+                uploadResultElement.textContent = "Scanning...";
+                
+                html5QrCode.scanFile(file, true)
+                    .then(decodedText => {
+                        uploadResultElement.textContent = decodedText;
+                        showNotification('QR Code scanned successfully!', 'success');
+                    })
+                    .catch(err => {
+                        uploadResultElement.textContent = "No QR code found in the image.";
+                        showNotification('No QR code found in the image.', 'error');
+                    });
+            });
+
+            function showNotification(message, type) {
+                notification.textContent = message;
+                notification.className = 'notification ' + type;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+
+            // Auto-start scanning on page load
+            setTimeout(startScanning, 500);
+        });
+    </script>
+</body>
+      </html>
