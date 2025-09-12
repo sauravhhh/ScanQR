@@ -55,6 +55,7 @@
         #reader {
             width: 100%;
             border-bottom: 1px solid #e9ecef;
+            display: none;
         }
 
         .result-container {
@@ -62,7 +63,7 @@
             text-align: center;
         }
 
-        #result {
+        .result-box {
             background-color: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
@@ -70,23 +71,36 @@
             word-break: break-all;
             min-height: 60px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             color: #495057;
             border: 1px solid #e9ecef;
         }
 
+        .result-text {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
         .btn {
             background-color: #ffffff;
             color: #343a40;
             border: 1px solid #dee2e6;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.9rem;
             transition: all 0.3s ease;
-            margin: 5px;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .btn:hover {
@@ -102,6 +116,11 @@
 
         .btn-primary:hover {
             background-color: #dee2e6;
+        }
+
+        .btn-icon {
+            width: 16px;
+            height: 16px;
         }
 
         .upload-section {
@@ -223,6 +242,11 @@
                 padding: 8px 16px;
                 font-size: 0.9rem;
             }
+            
+            .result-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -243,7 +267,23 @@
                 <div class="result-container">
                     <button id="startButton" class="btn btn-primary">Start Scanning</button>
                     <button id="stopButton" class="btn">Stop Scanning</button>
-                    <div id="result">Scan a QR code to see the result</div>
+                    <div class="result-box">
+                        <div id="result" class="result-text">Scan a QR code to see the result</div>
+                        <div id="camera-actions" class="result-actions" style="display: none;">
+                            <button id="copy-camera-result" class="btn">
+                                <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                Copy
+                            </button>
+                            <button id="share-camera-result" class="btn">
+                                <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
+                                </svg>
+                                Share
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -253,8 +293,22 @@
                         <input type="file" id="file-input" accept="image/*">
                         <label for="file-input" class="file-input-label">Choose QR Code Image</label>
                     </div>
-                    <div id="upload-result" style="margin-top: 15px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; min-height: 60px; display: flex; align-items: center; justify-content: center; color: #495057;">
-                        Upload a QR code image to scan
+                    <div class="result-box">
+                        <div id="upload-result" class="result-text">Upload a QR code image to scan</div>
+                        <div id="upload-actions" class="result-actions" style="display: none;">
+                            <button id="copy-upload-result" class="btn">
+                                <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                Copy
+                            </button>
+                            <button id="share-upload-result" class="btn">
+                                <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
+                                </svg>
+                                Share
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -280,8 +334,18 @@
             const uploadTab = document.getElementById('upload-tab');
             const cameraContent = document.getElementById('camera-content');
             const uploadContent = document.getElementById('upload-content');
+            const readerElement = document.getElementById('reader');
+            
+            // Action buttons
+            const copyCameraBtn = document.getElementById('copy-camera-result');
+            const shareCameraBtn = document.getElementById('share-camera-result');
+            const copyUploadBtn = document.getElementById('copy-upload-result');
+            const shareUploadBtn = document.getElementById('share-upload-result');
+            const cameraActions = document.getElementById('camera-actions');
+            const uploadActions = document.getElementById('upload-actions');
             
             let isScanning = false;
+            let currentResult = '';
 
             // Tab switching
             cameraTab.addEventListener('click', () => {
@@ -289,6 +353,9 @@
                 uploadTab.classList.remove('active');
                 cameraContent.classList.add('active');
                 uploadContent.classList.remove('active');
+                
+                // Hide the reader element when switching tabs to prevent showing uploaded image
+                readerElement.style.display = 'none';
             });
 
             uploadTab.addEventListener('click', () => {
@@ -310,6 +377,8 @@
             function startScanning() {
                 if (isScanning) return;
                 
+                readerElement.style.display = 'block';
+                
                 html5QrCode.start(
                     { facingMode: "environment" },
                     {
@@ -317,7 +386,9 @@
                         qrbox: { width: 250, height: 250 }
                     },
                     (decodedText, decodedResult) => {
+                        currentResult = decodedText;
                         resultElement.textContent = decodedText;
+                        cameraActions.style.display = 'flex';
                         showNotification('QR Code scanned successfully!', 'success');
                     },
                     (errorMessage) => {
@@ -326,9 +397,11 @@
                 ).then(() => {
                     isScanning = true;
                     resultElement.textContent = "Scanning...";
+                    cameraActions.style.display = 'none';
                     showNotification('Camera started. Point at a QR code to scan.', 'success');
                 }).catch(err => {
                     resultElement.textContent = "Error starting camera: " + err;
+                    cameraActions.style.display = 'none';
                     showNotification('Error accessing camera. Please check permissions.', 'error');
                 });
             }
@@ -338,7 +411,9 @@
                 
                 html5QrCode.stop().then(() => {
                     isScanning = false;
+                    readerElement.style.display = 'none';
                     resultElement.textContent = "Scan a QR code to see the result";
+                    cameraActions.style.display = 'none';
                     showNotification('Camera stopped.', 'success');
                 }).catch(err => {
                     showNotification('Error stopping camera: ' + err, 'error');
@@ -353,17 +428,77 @@
                 
                 const file = e.target.files[0];
                 uploadResultElement.textContent = "Scanning...";
+                uploadActions.style.display = 'none';
+                
+                // Make sure camera is not showing
+                readerElement.style.display = 'none';
                 
                 html5QrCode.scanFile(file, true)
                     .then(decodedText => {
+                        currentResult = decodedText;
                         uploadResultElement.textContent = decodedText;
+                        uploadActions.style.display = 'flex';
                         showNotification('QR Code scanned successfully!', 'success');
                     })
                     .catch(err => {
                         uploadResultElement.textContent = "No QR code found in the image.";
+                        uploadActions.style.display = 'none';
                         showNotification('No QR code found in the image.', 'error');
                     });
             });
+
+            // Copy functionality
+            copyCameraBtn.addEventListener('click', () => {
+                copyToClipboard(resultElement.textContent);
+            });
+
+            copyUploadBtn.addEventListener('click', () => {
+                copyToClipboard(uploadResultElement.textContent);
+            });
+
+            function copyToClipboard(text) {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        showNotification('Copied to clipboard!', 'success');
+                    }).catch(err => {
+                        showNotification('Failed to copy: ' + err, 'error');
+                    });
+                } else {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showNotification('Copied to clipboard!', 'success');
+                }
+            }
+
+            // Share functionality
+            shareCameraBtn.addEventListener('click', () => {
+                shareContent(resultElement.textContent);
+            });
+
+            shareUploadBtn.addEventListener('click', () => {
+                shareContent(uploadResultElement.textContent);
+            });
+
+            function shareContent(text) {
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'QR Code Result',
+                        text: text
+                    }).then(() => {
+                        showNotification('Shared successfully!', 'success');
+                    }).catch(err => {
+                        showNotification('Sharing cancelled or failed: ' + err, 'error');
+                    });
+                } else {
+                    // Fallback to copy if share API is not available
+                    copyToClipboard(text);
+                }
+            }
 
             function showNotification(message, type) {
                 notification.textContent = message;
@@ -380,4 +515,4 @@
         });
     </script>
 </body>
-      </html>
+                                </html>
